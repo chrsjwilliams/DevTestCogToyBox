@@ -125,6 +125,9 @@ public class GameBoard : MonoBehaviour
 
     public void OnPlayMade(PlayMadeEvent e)
     {
+        //  To optimize checking for empty spaces, I cache the value in a variable.
+        //  If no has won and emptySpaces is 0, the game is a tie.
+        //  Checking for ties this way saves me from checking each tile after a play is made
         emptySpaces--;
         if(CheckForWin(e.tileSpace.coord))
         {
@@ -133,10 +136,6 @@ public class GameBoard : MonoBehaviour
         else if(AllSpacesOccupied())
         {
             Services.EventManager.Fire(new GameEndEvent(null));
-        }
-        else
-        {
-
         }
  
     }
@@ -147,8 +146,16 @@ public class GameBoard : MonoBehaviour
     }
     public bool CheckForWin(Vector2 coord)
     {
+        //  Create a list of sets with the last played coord that could win
         List<HashSet<Vector2>> candidateSets = new List<HashSet<Vector2>>();
 
+        //  I should only check sets with the last played coord.
+        //  If a winning set has that coord, add it to the sets I will check
+
+        //  This saves me time from checking every possible combination to 
+        //  confirm if someone has won. On draw back is this does not scale to a connect 4 game,
+        //  but it does open the opportunity to other pattern matching games where the goal is
+        //  to make a specific pattern.
         foreach(HashSet<Vector2> set in winningSets)
         {
             if(set.Contains(coord))
@@ -157,6 +164,9 @@ public class GameBoard : MonoBehaviour
             }
         }
 
+        //  If each space in the set has the same occupying player and that player isn't null,
+        //  then someone has won. Ohterwise, keep checking. After all sets have been exhausted,
+        //  we can confirm no one has won yet.
         foreach(HashSet<Vector2> set in candidateSets)
         {
             if(CheckSet(set, coord))

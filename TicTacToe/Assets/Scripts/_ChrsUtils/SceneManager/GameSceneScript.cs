@@ -88,12 +88,16 @@ public class GameSceneScript : Scene<TransitionData>
             _turnIndicatorIcon.sprite = players[(int)PlayerNum.PLAYER2].PlayerIcon;
         }
 
+        // These are independent tasks I want to complete when entering the game scene
         Task fadeIndicatorIconTask = new LERPColor(_turnIndicatorIcon, _transparent, currentPlayer.playerColor[0], 3f);
         Task fadeIndicatorTextTask = new LERPColor(_turnIndicator, _transparent, currentPlayer.playerColor[0], 3f);
         Task fadeHomeButtonTask = new LERPColor(_homeButtonIcon, _transparent, _iconGray, 1f);
         Task fadeReplayButtonTask = new LERPColor(_replayButtonIcon, _transparent, _iconGray, 1f);
 
-
+        // I want to compelte these tasks in parallel so I use a TaskTree.
+        // How it works:
+        //              A Task tree will complete the Task at its root first, then move on to complete
+        //              the tasks in in child nodes in parallel.
         TaskTree uiEntryTask = new TaskTree(new EmptyTask(), 
                                                 new TaskTree(fadeIndicatorIconTask),
                                                 new TaskTree(fadeIndicatorTextTask),
@@ -160,11 +164,6 @@ public class GameSceneScript : Scene<TransitionData>
         }
     }
 
-    public void SetCurrentPlayerTurn(Player p)
-    {
-
-    }
-
     public void OnRestartPressed()
     {
         Services.AudioManager.CreateTrackAndPlay(Clips.TAP);
@@ -177,6 +176,9 @@ public class GameSceneScript : Scene<TransitionData>
         Task fadeReplayButtonTask = new LERPColor(_replayButtonIcon, _iconGray, _transparent,0.5f);
         Task fadeGradient = new LERPColor(_gradient, _gradient.color, _transparent, 0.75f);
 
+        //  Here we have a modification of the Task tree where we want to compelte the fading
+        //  board animation and waiting tasks in parallel, than compete the ResetGameScene Task.
+        //  To accomplish this, I made the ResetGameScene Task a child of the Wait task.
         TaskTree restartGameTasks = new TaskTree(new EmptyTask(), 
                                                 new TaskTree(fadeIndicatorIconTask),
                                                 new TaskTree(fadeIndicatorTextTask),
@@ -208,6 +210,7 @@ public class GameSceneScript : Scene<TransitionData>
         Task fadeReplayButtonTask = new LERPColor(_replayButtonIcon, _iconGray, _transparent,0.5f);
         Task fadeGradient = new LERPColor(_gradient, _gradient.color, _transparent, 0.75f);
 
+        // This is the smae idea found in the OnRestartPressed function above
         TaskTree returnHomeTasks = new TaskTree(new EmptyTask(), 
                                                 new TaskTree(fadeIndicatorIconTask),
                                                 new TaskTree(fadeIndicatorTextTask),
@@ -232,11 +235,6 @@ public class GameSceneScript : Scene<TransitionData>
     private void EndGame()
     {
         Services.AudioManager.FadeAudio();
-
-    }
-
-    public void EndTransition()
-    {
 
     }
     

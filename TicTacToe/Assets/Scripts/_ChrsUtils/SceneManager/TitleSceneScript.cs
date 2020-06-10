@@ -29,6 +29,7 @@ public class TitleSceneScript : Scene<TransitionData>
             Services.AudioManager.SetVolume(0.5f);
         Services.AudioManager.PlayClip(Clips.TITLE_SONG);
         Services.GameManager.UpdateMutIcon(audioStatusIcon);
+        
         for (int i = 0; i < titleText.Length; i++)
         {
             titleText[i].gameObject.SetActive(false);
@@ -63,6 +64,7 @@ public class TitleSceneScript : Scene<TransitionData>
     {
         Services.AudioManager.CreateTrackAndPlay(Clips.TAP);
         Services.AudioManager.FadeAudio();
+
         hasLoadGame = false;
         TaskQueue startGameTasks = new TaskQueue();
         Task slideTitleOut = new TitleEntryAnimation(titleText, true);
@@ -83,11 +85,6 @@ public class TitleSceneScript : Scene<TransitionData>
     public void ToggleMute()
     {
         Services.GameManager.ToggleMute(audioStatusIcon);
-    }
-
-    private void TitleTransition()
-    {
-
     }
 
     private void TransitionToGame()
